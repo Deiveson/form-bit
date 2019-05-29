@@ -10,9 +10,13 @@ export const setObjectValue = (path, value, obj = {}) => {
     return obj;
 };
 export const getObjectValue = (object, value) => {
-    return value.length <= 1
-        ? object[value]
-        : this.getObjectValue(object[value.shift()], value);
+    if(value.length <= 1){
+        return object[value];
+    } else {
+        if(object[value.shift()]){
+            return getObjectValue(object[value.shift()], value);
+        } else return ""
+    }
 };
 
 export function setProps(childs, props, name) {
@@ -46,12 +50,18 @@ export function getProps(childs, prop, name) {
     let value = false;
     if (childs.length < 1) return value;
     if (childs.map) {
+        if(name){
              childs.map((item, key) => {
                 if(item.props.name === name) {
                     value = item.props[prop];
                 }
                 return true;
             });
+        } else {
+            value = childs.map(item => {
+                return item.props[prop];
+            })
+        }
     } else {
         value = childs.props[prop];
     }

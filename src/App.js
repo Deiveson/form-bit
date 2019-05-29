@@ -10,13 +10,13 @@ class App extends Component{
     render() {
         return (
             <div className="App">
-                <FormBit submit={(values)=> {console.log(values)}} send={this.state.submit}>
-                    <Input title="Nome" name="name" minLength="3" required />
-                    <Input title="Sobrenome" name="lastName" required />
+                <FormBit submit={(values)=> {console.log(values)}}>
+                    <Input title="Nome" name="name" maxLength={"4"} />
+                    <Input title="Sobrenome" name="lastName" maxLength={"2"} />
                     <Input title="Rua" name="address.street" required/>
                     <Input title="Número" name="address.number" required />
                     <Fragment>
-                        <button onClick={() => this.setState({submit: true})}>
+                        <button type="submit">
                             Enviar
                         </button>
                     </Fragment>

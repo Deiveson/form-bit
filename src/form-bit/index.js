@@ -1,18 +1,18 @@
 import React, {Component} from "react";
-import { setObjectValue, setProps, getProps, maxLength, minLength, required } from "./fnUtils"
+import {setObjectValue, setProps, getProps, maxLength, minLength, required, getObjectValue} from "./fnUtils"
 
 export default class FormBit extends Component {
 constructor(props){
     super(props);
-    this.state = {values: {}, childrens: this.props.children, send: false};
+    this.state = {values: this.props.initialValues || {} , childrens: this.props.children, send: false};
 }
 componentDidMount() {
-    let childrens = setProps(this.props.children, {name: "handleField", value: (name, value) => this.handleField(name, value)});
+    let childrens = this.state.childrens.map(child => ({
+        ...child,
+        props: {...child.props, handleField: (name, value) => this.handleField(name, value), value: getObjectValue(this.state.values, child.props.name? child.props.name.split("."): [])}
+    }));
+
     this.setState({childrens})
-}
-componentDidUpdate(prevProps, prevState, snapshot) {
-    if(this.props.send === true && this.state.send === false)
-        this.validate()
 }
 
 validate(){
@@ -31,7 +31,7 @@ validate(){
                 if(this.setError(minLength(child.props.value, child.props.minLength), child.props.name, "minLength"))
                     haveError = true;
             }
-            if(child.props.minLength) {
+            if(child.props.required) {
                 if(this.setError(required(child.props.value), child.props.name, "required"))
                     haveError = true;
             }
@@ -40,7 +40,6 @@ validate(){
     }
     if (!haveError) {
         this.props.submit(this.state.values);
-        this.setState({send: true});
     }
 }
 
@@ -64,7 +63,7 @@ handleField(name, value){
     let localValues = setObjectValue(name.split("."), value, this.state.values);
     this.setState({values: localValues});
 
-    let childrens = setProps(this.state.childrens, {name: "value", value});
+    let childrens = setProps(this.state.childrens, {name: "value", value}, name);
     this.setState({childrens});
 
 }
