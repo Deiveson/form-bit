@@ -5,7 +5,7 @@ const Input = props => {
             <Fragment>
                 <label>
                     {props.title}:
-                    <input type="text" name={props.name} onChange={ e => props.handleField(props.name, e.target.value)} value={props.value}/>
+                    <input type="text" name={props.name} value={props.value} onChange={ e => props.handleField(props.name, e.target.value)}/><span>{props.error}</span>
                 </label><br />
             </Fragment>
         )

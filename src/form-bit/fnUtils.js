@@ -9,16 +9,10 @@ export const setObjectValue = (path, value, obj = {}) => {
     curr[lastKey] = value;
     return obj;
 };
-export const getObjectValue = (object, value) => {
-    if(value.length <= 1){
-        return object[value];
-    } else {
-        if(object[value.shift()]){
-            return getObjectValue(object[value.shift()], value);
-        } else return ""
-    }
+export const getObjectValue = (item, value) => {
+    if (!value || !item) return null;
+    return value.length <= 1 ? item[value] : getObjectValue(item[value.shift()], value);
 };
-
 export function setProps(childs, props, name) {
     if (childs.length < 1) return false;
     if (childs.map) {
@@ -45,7 +39,6 @@ export function setProps(childs, props, name) {
     }
     return childs;
 }
-
 export function getProps(childs, prop, name) {
     let value = false;
     if (childs.length < 1) return value;
