@@ -1,14 +1,18 @@
-import React, {Fragment} from 'react';
+import React, {Component, Fragment} from 'react';
 
-const Input = props => {
+class Input extends Component{
+    render(){
         return (
             <Fragment>
                 <label>
-                    {props.title}:
-                    <input type="text" name={props.name} value={props.value} onChange={ e => props.handleField(props.name, e.target.value)}/><span>{props.error}</span>
+                    {this.props.title}:
+                    <input type="text"
+                           name={this.props.name} value={this.props.value} disabled={this.props.disabled}
+                           onChange={e => this.props.handleField(this.props.name, e.target.value)}/>
+                           <span>{this.props.error}</span>
                 </label><br />
             </Fragment>
-        )
+        )}
 };
 
 export default Input;

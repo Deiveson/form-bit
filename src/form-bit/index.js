@@ -1,77 +1,90 @@
 import React, {Component} from "react";
-import {setObjectValue, setProps, maxLength, minLength, required, getObjectValue} from "./fnUtils"
+import {maxLength, minLength, required, setObjectValue} from "./fnUtils"
 
 export default class FormBit extends Component {
 constructor(props){
     super(props);
-    this.state = {values: this.props.initialValues || {} , childrens: this.props.children, send: false};
-}
-componentWillMount() {
-    let childrens = this.state.childrens.map(child => ({
-        ...child,
-        props: {...child.props, handleField: (name, value) => this.handleField(name, value), value: getObjectValue(this.state.values, child.props.name? child.props.name.split("."): []) || ""}
-    }));
-    this.setState({childrens})
+    this.state = {values: {}, errors: {}};
 }
 
-validate(){
-    let {childrens} = this.state;
-    let errors = false;
+validate(e){
+    e.preventDefault();
+    let childrens = this.props.children;
+    let errors = {};
+    let otherErrors = false;
 
     if(childrens.length < 1)
         return false;
     if(childrens.map){
-        childrens = childrens.map(child => {
-            let error = "";
+        childrens.map(child => {
             if(child.props.maxLength) {
-                error = maxLength(child.props.value, child.props.maxLength);
+                let  error = maxLength(this.state.values[child.props.name], child.props.maxLength);
                 if(error) {
-                    errors = true;
-                    return {...child, props: {...child.props, error}};
-                }
-            }
-            if(child.props.minLength) {
-                error = minLength(child.props.value, child.props.minLength);
-                if(error) {
-                    errors = true;
-                    return {...child, props: {...child.props, error}};
+                    errors = {...errors, [child.props.name]:error};
+                    otherErrors = true;
+                } else if(!otherErrors) {
+                    errors = {...errors, [child.props.name]: false}
                 }
             }
             if(child.props.required) {
-                error = required(child.props.value, child.props.maxLength);
+                let error = required(this.state.values[child.props.name], child.props.maxLength);
                 if(error) {
-                    errors = true;
-                    return {...child, props: {...child.props, error}};
+                    errors = {...errors, [child.props.name]:error};
+                    otherErrors = true;
+                } else if(!otherErrors) {
+                    errors = {...errors, [child.props.name]: false}
                 }
             }
-            return child;
+            if(child.props.minLength) {
+                let error = minLength(this.state.values[child.props.name], child.props.minLength);
+                if(error) {
+                    errors = {...errors, [child.props.name]:error};
+                    otherErrors = true;
+                } else if(!otherErrors) {
+                    errors = {...errors, [child.props.name]: false}
+                }
+            }
+            return true;
         });
+        this.setState({errors: {...this.state.errors, ...errors}});
     }
-    if(!errors){
-        this.props.submit(this.state.values);
-    } else {
-        this.setState({childrens});
+    if(!otherErrors){
+        this.handleSubmit();
     }
 }
 
-handleSubmit(e) {
-    e.preventDefault();
-    this.validate()
+handleSubmit() {
+    let values = {};
+    for(let key in this.state.values){
+        values = setObjectValue(key.split("."), this.state.values[key], values);
+    }
+    console.log(values);
 }
 
 handleField(name, value){
-    let localValues = setObjectValue(name.split("."), value, this.state.values);
-    this.setState({values: localValues});
+    this.setState({values: {...this.state.values, [name]: value}})
+}
 
-    let childrens = setProps(this.state.childrens, {name: "value", value}, name);
-    this.setState({childrens});
-
+drawFrom(childrens){
+   return childrens.map(child => {
+       if(child.props.name){
+           return {
+               ...child,
+               props: {
+                   ...child.props,
+                   handleField: (name, value) => this.handleField(name, value),
+                   value: this.state.values[child.props.name] || "",
+                   error: this.state.errors[child.props.name]
+               }
+           }
+       } else return child;
+   });
 }
 
 render() {
     return(
-        <form onSubmit={ e => this.handleSubmit(e)}>
-            {this.state.childrens}
+        <form onSubmit={ e => this.validate(e)}>
+            {this.drawFrom(this.props.children)}
         </form>
     );
 }
