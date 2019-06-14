@@ -1,4 +1,4 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import FormBit from "./form-bit"
 import Input from "./input"
 class App extends Component{
@@ -15,11 +15,9 @@ class App extends Component{
                     <Input title="Sobrenome" name="lastName" maxLength={"2"} />
                     <Input title="Rua" name="address.street" required/>
                     <Input title="Número" name="address.number" disabled={this.state.disabled} required minLength={"3"} maxLength={"4"}/>
-                    <Fragment>
-                        <button type="submit">
-                            Enviar
-                        </button>
-                    </Fragment>
+                    <button type="submit">
+                        Enviar
+                    </button>
                 </FormBit>
                 <button onClick={()=> this.setState({disabled: true})}>
                     disable

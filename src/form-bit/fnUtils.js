@@ -9,56 +9,25 @@ export const setObjectValue = (path, value, obj = {}) => {
     curr[lastKey] = value;
     return obj;
 };
-export const getObjectValue = (item, value) => {
-    if (!value || !item) return null;
-    return value.length <= 1 ? item[value] : getObjectValue(item[value.shift()], value);
-};
-export function setProps(childs, props, name) {
-    if (childs.length < 1) return false;
-    if (childs.map) {
-        if (name) {
-            childs = childs.map((item, key) => {
-                if(item.props.name === name) {
-                    return {
-                        ...item,
-                        props: {...item.props, [props["name"]]: props["value"]}
-                    };
-                } else return {...item}
-            });
+
+export function flattenObject(ob) {
+    let toReturn = {};
+
+    for (var i in ob) {
+        if (!ob.hasOwnProperty(i)) continue;
+
+        if ((typeof ob[i]) == 'object' && ob[i] !== null) {
+            var flatObject = flattenObject(ob[i]);
+            for (var x in flatObject) {
+                if (!flatObject.hasOwnProperty(x)) continue;
+
+                toReturn[i + '.' + x] = flatObject[x];
+            }
         } else {
-            childs = childs.map((item, key) => ({
-                ...item,
-                props: { ...item.props, [props["name"]]: props["value"] }
-            }));
+            toReturn[i] = ob[i];
         }
-    } else {
-        childs = {
-            ...childs,
-            props: { ...childs.props, [props["name"]]: props["value"] }
-        };
     }
-    return childs;
-}
-export function getProps(childs, prop, name) {
-    let value = false;
-    if (childs.length < 1) return value;
-    if (childs.map) {
-        if(name){
-             childs.map((item, key) => {
-                if(item.props.name === name) {
-                    value = item.props[prop];
-                }
-                return true;
-            });
-        } else {
-            value = childs.map(item => {
-                return item.props[prop];
-            })
-        }
-    } else {
-        value = childs.props[prop];
-    }
-    return value;
+    return toReturn;
 }
 
 export const maxLength = (value = "", max) => {

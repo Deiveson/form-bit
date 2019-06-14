@@ -1,10 +1,17 @@
 import React, {Component} from "react";
-import {maxLength, minLength, required, setObjectValue} from "./fnUtils"
+import {maxLength, minLength, required, setObjectValue, flattenObject} from "./fnUtils"
 
 export default class FormBit extends Component {
 constructor(props){
     super(props);
     this.state = {values: {}, errors: {}};
+}
+
+componentWillMount() {
+    if(this.props.initialValues){
+        let values = flattenObject(this.props.initialValues);
+        this.setState({values});
+    }
 }
 
 validate(e){
@@ -58,7 +65,7 @@ handleSubmit() {
     for(let key in this.state.values){
         values = setObjectValue(key.split("."), this.state.values[key], values);
     }
-    console.log(values);
+    this.props.submit(values);
 }
 
 handleField(name, value){
