@@ -20,7 +20,6 @@ export function flattenObject(ob) {
             var flatObject = flattenObject(ob[i]);
             for (var x in flatObject) {
                 if (!flatObject.hasOwnProperty(x)) continue;
-
                 toReturn[i + '.' + x] = flatObject[x];
             }
         } else {

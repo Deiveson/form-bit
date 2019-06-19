@@ -13,6 +13,6 @@ class Input extends Component{
                 </label><br />
             </Fragment>
         )}
-};
+}
 
 export default Input;
